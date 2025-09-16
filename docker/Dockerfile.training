@@ -1,0 +1,27 @@
+# docker/Dockerfile.training
+FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements/ ./requirements/
+RUN pip install --no-cache-dir -r requirements/base.txt -r requirements/train.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p data/raw data/processed checkpoints logs
+
+# Download Shakespeare dataset
+RUN python scripts/prepare_data.py --dataset shakespeare
+
+# Default command
+CMD ["python", "scripts/train.py", "--config", "config/train_shakespeare.yaml"]

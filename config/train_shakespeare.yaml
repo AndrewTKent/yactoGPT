@@ -1,0 +1,21 @@
+# config/train_shakespeare.yaml
+# Inherits from base.yaml and overrides specific values
+inherit: base.yaml
+
+model:
+  n_embd: 384
+  n_head: 6
+  n_layer: 6
+  block_size: 256
+
+training:
+  batch_size: 64
+  learning_rate: 3e-4
+  max_iters: 10000
+  
+data:
+  dataset: shakespeare
+  data_path: data/raw/shakespeare.txt
+  
+logging:
+  wandb_run_name: shakespeare-char-small

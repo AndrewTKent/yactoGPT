@@ -1,0 +1,64 @@
+# docker/docker-compose.yaml
+version: '3.8'
+
+services:
+  yacto-gpt-inference:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.inference
+    image: yacto-gpt:inference
+    container_name: yacto-gpt-inference
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../checkpoints:/app/checkpoints:ro
+    environment:
+      - MODEL_PATH=/app/checkpoints/best_model.pt
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - yacto-net
+    restart: unless-stopped
+
+  yacto-gpt-training:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.training
+    image: yacto-gpt:training
+    container_name: yacto-gpt-training
+    volumes:
+      - ../checkpoints:/app/checkpoints
+      - ../logs:/app/logs
+      - ../data:/app/data
+    environment:
+      - WANDB_API_KEY=${WANDB_API_KEY}
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - yacto-net
+    profiles:
+      - training
+
+networks:
+  yacto-net:
+    driver: bridge
+
+---
+
+# requirements/base.txt
+torch>=2.1.0
+numpy>=1.24.0
+pyyaml>=6.0
+tqdm>=4.65.0

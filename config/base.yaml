@@ -1,0 +1,35 @@
+# config/base.yaml
+model:
+  n_embd: 384
+  n_head: 6
+  n_layer: 6
+  block_size: 256
+  dropout: 0.2
+  bias: false
+  vocab_size: null  # Will be set by tokenizer
+
+training:
+  batch_size: 64
+  learning_rate: 3e-4
+  max_iters: 5000
+  eval_interval: 500
+  eval_iters: 200
+  warmup_iters: 100
+  weight_decay: 1e-2
+  grad_clip: 1.0
+  compile_model: true
+  device: auto  # auto, cuda, cpu
+  dtype: float16  # float32, float16, bfloat16
+  
+data:
+  train_split: 0.9
+  tokenizer_type: character
+  
+logging:
+  wandb_project: yacto-gpt
+  wandb_enabled: true
+  log_interval: 100
+  sample_interval: 500
+  checkpoint_interval: 1000
+  
+seed: 42

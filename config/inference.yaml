@@ -1,0 +1,14 @@
+# config/inference.yaml
+inference:
+  temperature: 0.8
+  top_k: 40
+  top_p: 0.95
+  max_new_tokens: 500
+  seed: 42
+  device: auto
+  dtype: float16
+  
+api:
+  host: 0.0.0.0
+  port: 8080
+  max_batch_size: 32

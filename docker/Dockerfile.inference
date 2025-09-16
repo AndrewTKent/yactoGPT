@@ -1,0 +1,51 @@
+# docker/Dockerfile.inference
+# Multi-stage build for minimal image size
+FROM python:3.10-slim as builder
+
+WORKDIR /app
+
+# Copy requirements
+COPY requirements/base.txt requirements/inference.txt ./
+RUN pip install --no-cache-dir --user -r base.txt -r inference.txt
+
+# Final stage
+FROM python:3.10-slim
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libgomp1 && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Python packages from builder
+COPY --from=builder /root/.local /root/.local
+
+# Copy application code
+COPY models/ ./models/
+COPY inference/ ./inference/
+COPY tokenizers/ ./tokenizers/
+COPY utils/ ./utils/
+COPY scripts/serve.py ./scripts/
+COPY config/inference.yaml ./config/
+
+# Make sure scripts are in PATH
+ENV PATH=/root/.local/bin:$PATH
+
+# Create checkpoints directory
+RUN mkdir -p checkpoints
+
+# Default environment variables
+ENV CUDA_VISIBLE_DEVICES=""
+ENV MODEL_PATH="/app/checkpoints/best_model.pt"
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Run server
+CMD ["python", "scripts/serve.py", "--checkpoint", "${MODEL_PATH}"]
