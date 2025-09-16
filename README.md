@@ -2,7 +2,7 @@
 
 # yacto-GPT 🚀
 
-Yet Another Clean and Tiny OpenAI GPT - A minimal, clean, and scalable implementation of GPT for educational purposes and production deployment.
+A Clean and Tiny OpenAI GPT - A minimal, clean, and scalable implementation of GPT.
 
 ## Features
 
@@ -20,7 +20,7 @@ Yet Another Clean and Tiny OpenAI GPT - A minimal, clean, and scalable implement
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/yacto-gpt.git
+git clone https://github.com/andrewtkent/yacto-gpt.git
 cd yacto-gpt
 
 # Install dependencies
